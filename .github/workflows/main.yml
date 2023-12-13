@@ -1,0 +1,76 @@
+name: AllPS Server CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+env:
+  S3_BUCKET_NAME: allps-deploy
+  CODE_DEPLOY_APPLICATION_NAME: allps-server-deploy
+  CODE_DEPLOY_DEPLOYMENT_GROUP_NAME: my-codedeploy-deployment-group
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-18.04
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up JDK 17
+      uses: actions/setup-java@v3
+      with:
+        java-version: '17'
+        distribution: 'corretto'
+
+    - name: Create application.properties
+      run: |
+        mkdir -p ./src/main/resources
+        touch ./src/main/resources/application.properties
+        echo "${{ secrets.APPLICATION_PROPERTIES }}" > ./src/main/resources/application.properties
+        
+    - name: Grant execute permission for gradlew
+      run: chmod +x gradlew
+      
+    - name: Build with Gradle
+      run: ./gradlew clean build
+
+    - name: Create deploy directory
+      run: mkdir -p deploy
+
+    - name: Copy jar to deploy directory
+      run: cp ./build/libs/*.jar ./deploy
+
+    - name: Copy scripts to deploy directory
+      run: cp ./scripts/*.sh ./deploy
+
+    - name: Make zip file
+      run: zip -r ./deploy.zip ./deploy
+
+    - name: Upload deploy.zip to S3
+    - uses: shallwefootball/s3-upload-action@master
+      with:
+        aws_key_id: ${{ secrets.AWS_KEY_ID }}
+        aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY}}
+        aws_bucket: ${{ secrets.AWS_BUCKET }}
+        source_dir: './deploy.zip'
+        destination_dir: 'allps-server'
+
+    - name: Deploy to server from S3
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.SERVER_HOST }}
+        username: ${{ secrets.SERVER_USERNAME }}
+        password: ${{ secrets.SERVER_PASSWORD }}
+        port: ${{ secrets.SERVER_SSH_PORT }}
+        script: |
+          mkdir -p /root/allps-server
+          cd /root/allps-server
+          aws s3 cp s3://allps-deploy/allps-server/deploy.zip ./
+          unzip -o deploy.zip
+          chmod +x deploy.sh
+          ./deploy.sh
