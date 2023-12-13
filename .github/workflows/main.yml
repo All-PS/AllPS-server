@@ -46,10 +46,7 @@ jobs:
     - name: Copy scripts to deploy directory
       run: cp ./scripts/*.sh ./deploy
 
-    - name: Make zip file
-      run: zip -r ./deploy.zip ./deploy
-
-    - name: Upload deploy.zip to S3
+    - name: Upload deploy directory to S3
       uses: shallwefootball/s3-upload-action@master
       with:
         aws_key_id: ${{ secrets.AWS_KEY_ID }}
@@ -67,7 +64,7 @@ jobs:
         port: ${{ secrets.SERVER_SSH_PORT }}
         script: |
           mkdir -p /root/allps-server
-          aws s3 sync s3://allps-deploy/allps-server /root/allps-server
+          aws s3 cp s3://allps-deploy/allps-server /root/allps-server --recursive
           cd /root/allps-server
           chmod +x deploy.sh
           ./deploy.sh
