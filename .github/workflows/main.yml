@@ -58,17 +58,16 @@ jobs:
         source_dir: './deploy'
         destination_dir: 'allps-server'
 
-    # - name: Deploy to server from S3
-    #   uses: appleboy/ssh-action@master
-    #   with:
-    #     host: ${{ secrets.SERVER_HOST }}
-    #     username: ${{ secrets.SERVER_USERNAME }}
-    #     password: ${{ secrets.SERVER_PASSWORD }}
-    #     port: ${{ secrets.SERVER_SSH_PORT }}
-    #     script: |
-    #       mkdir -p /root/allps-server
-    #       cd /root/allps-server
-    #       aws s3 cp s3://allps-deploy/allps-server/deploy.zip ./
-    #       unzip -o deploy.zip
-    #       chmod +x deploy.sh
-    #       ./deploy.sh
+    - name: Deploy to server from S3
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.SERVER_HOST }}
+        username: ${{ secrets.SERVER_USERNAME }}
+        password: ${{ secrets.SERVER_PASSWORD }}
+        port: ${{ secrets.SERVER_SSH_PORT }}
+        script: |
+          mkdir -p /root/allps-server
+          aws s3 sync s3://allps-deploy/allps-server /root/allps-server
+          cd /root/allps-server
+          chmod +x deploy.sh
+          ./deploy.sh
