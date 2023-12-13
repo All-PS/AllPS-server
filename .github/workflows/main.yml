@@ -55,20 +55,20 @@ jobs:
         aws_key_id: ${{ secrets.AWS_KEY_ID }}
         aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws_bucket: ${{ secrets.AWS_BUCKET }}
-        source_dir: './deploy.zip'
+        source_dir: './deploy'
         destination_dir: 'allps-server'
 
-    - name: Deploy to server from S3
-      uses: appleboy/ssh-action@master
-      with:
-        host: ${{ secrets.SERVER_HOST }}
-        username: ${{ secrets.SERVER_USERNAME }}
-        password: ${{ secrets.SERVER_PASSWORD }}
-        port: ${{ secrets.SERVER_SSH_PORT }}
-        script: |
-          mkdir -p /root/allps-server
-          cd /root/allps-server
-          aws s3 cp s3://allps-deploy/allps-server/deploy.zip ./
-          unzip -o deploy.zip
-          chmod +x deploy.sh
-          ./deploy.sh
+    # - name: Deploy to server from S3
+    #   uses: appleboy/ssh-action@master
+    #   with:
+    #     host: ${{ secrets.SERVER_HOST }}
+    #     username: ${{ secrets.SERVER_USERNAME }}
+    #     password: ${{ secrets.SERVER_PASSWORD }}
+    #     port: ${{ secrets.SERVER_SSH_PORT }}
+    #     script: |
+    #       mkdir -p /root/allps-server
+    #       cd /root/allps-server
+    #       aws s3 cp s3://allps-deploy/allps-server/deploy.zip ./
+    #       unzip -o deploy.zip
+    #       chmod +x deploy.sh
+    #       ./deploy.sh
