@@ -55,9 +55,8 @@ jobs:
         aws_key_id: ${{ secrets.AWS_KEY_ID }}
         aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws_bucket: ${{ secrets.AWS_BUCKET }}
-        source_dir: '.'
-        source_file: './deploy.zip'
-        destination_dir: 'allps-server'
+        source_dir: './deploy.zip'
+        destination_dir: 'allps-server/deploy.zip'
 
     - name: Deploy to server from S3
       uses: appleboy/ssh-action@master
