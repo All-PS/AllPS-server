@@ -8,8 +8,6 @@ on:
 
 env:
   S3_BUCKET_NAME: allps-deploy
-  CODE_DEPLOY_APPLICATION_NAME: allps-server-deploy
-  CODE_DEPLOY_DEPLOYMENT_GROUP_NAME: my-codedeploy-deployment-group
 
 permissions:
   contents: read
@@ -57,10 +55,10 @@ jobs:
         aws_key_id: ${{ secrets.AWS_KEY_ID }}
         aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY}}
         aws_bucket: ${{ secrets.AWS_BUCKET }}
-        source_dir: './deploy.zip'
+        source_dir: './deploy.zip'
         destination_dir: 'allps-server'
 
-    - name: Deploy to server from S3
+    - name: Deploy to server from S3
       uses: appleboy/ssh-action@master
       with:
         host: ${{ secrets.SERVER_HOST }}
