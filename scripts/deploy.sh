@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
-REPOSITORY=~/repository/AllPS/allps-server/scripts/
-#REPOSITORY=/root/allps-server
+#REPOSITORY=~/repository/AllPS/allps-server/scripts/
+REPOSITORY=/root/allps-server
 
 chmod +x $REPOSITORY/stop.sh
 $REPOSITORY/stop.sh
