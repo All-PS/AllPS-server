@@ -29,7 +29,11 @@ jobs:
       run: |
         mkdir -p ./src/main/resources
         touch ./src/main/resources/application.properties
+        touch ./src/main/resources/application-server1.properties
+        touch ./src/main/resources/application-server2.properties
         echo "${{ secrets.APPLICATION_PROPERTIES }}" > ./src/main/resources/application.properties
+        echo "${{ secrets.APPLICATION_SERVER1_PROPERTIES }}" > ./src/main/resources/application-server1.properties
+        echo "${{ secrets.APPLICATION_SERVER2_PROPERTIES }}" > ./src/main/resources/application-server2.properties
         
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
