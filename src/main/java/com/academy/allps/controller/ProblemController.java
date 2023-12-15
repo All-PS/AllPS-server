@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@CrossOrigin(origins = "https://allps.io")
+@CrossOrigin(origins = "https://www.allps.io")
 public class ProblemController {
     private final ProblemService problemService;
 
