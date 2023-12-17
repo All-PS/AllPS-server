@@ -5,6 +5,7 @@ import com.academy.allps.dto.RequestDto;
 import com.academy.allps.dto.ResponseDto;
 import com.academy.allps.service.ProblemService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
+@CrossOrigin(origins = "https://www.allps.io")
 public class ProblemController {
     private final ProblemService problemService;
 
