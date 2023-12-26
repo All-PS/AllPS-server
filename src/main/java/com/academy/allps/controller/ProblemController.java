@@ -14,13 +14,14 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @CrossOrigin(origins = "https://www.allps.io")
-public class ProblemController {
+public class ProblemController implements ProblemControllerSwagger {
     private final ProblemService problemService;
 
     @PostMapping("/search")
-    public ResponseDto searchProblems(@RequestParam(required = false) String query,
-                                       @RequestParam(required = false) String type,
-                                       @RequestBody RequestDto requestDto) {
+    public ResponseDto searchProblems(
+            @RequestParam(required = false) String query,
+            @RequestParam(required = false) String type,
+            @RequestBody(required = true) RequestDto requestDto) {
 
         ProblemSearchCondition problemSearchCondition = new ProblemSearchCondition(query, type, requestDto);
         ResponseDto matchedProblems = problemService.getMatchedProblems(problemSearchCondition);
