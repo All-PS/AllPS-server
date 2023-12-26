@@ -1,7 +1,9 @@
 package com.academy.allps.controller;
 
+import com.academy.allps.type.QueryType;
 import com.academy.allps.dto.RequestDto;
 import com.academy.allps.dto.ResponseDto;
+import org.springframework.http.MediaType;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -10,7 +12,6 @@ import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.http.MediaType;
 
 @Tag(name = "Problem", description = "Problem API")
 public interface ProblemControllerSwagger {
@@ -26,6 +27,6 @@ public interface ProblemControllerSwagger {
     })
     ResponseDto searchProblems(
             @Parameter(description = "검색어", example = "A+B") String query,
-            @Parameter(description = "검색타입", example = "name") String type,
+            @Parameter(description = "검색타입", example = "name") QueryType type,
             @RequestBody(content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)) RequestDto requestDto);
 }
