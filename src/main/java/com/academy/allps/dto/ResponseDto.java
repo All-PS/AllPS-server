@@ -7,7 +7,7 @@ import lombok.Data;
 @AllArgsConstructor
 @Data
 public class ResponseDto {
-    private int page;
-    private int lastPage;
+    private long page;
+    private long lastPage;
     private List<ProblemDto> problems;
 }

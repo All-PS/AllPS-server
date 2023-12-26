@@ -1,20 +1,20 @@
-package com.academy.allps.domain;
+package com.academy.allps.entity;
 
+import com.academy.allps.type.PlatformType;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import lombok.Getter;
 
 @Entity
-@Getter
 public class Platform {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String name;
-    private String url;
 
-//    @OneToMany(mappedBy = "platform")
-//    List<Problem> problems;
+    @Enumerated(EnumType.STRING)
+    private PlatformType name;
+    private String url;
 }

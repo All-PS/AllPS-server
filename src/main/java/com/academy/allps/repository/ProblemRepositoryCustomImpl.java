@@ -1,145 +1,155 @@
 package com.academy.allps.repository;
 
-import static com.academy.allps.domain.QCategory.category;
-import static com.academy.allps.domain.QDifficulty.difficulty;
-import static com.academy.allps.domain.QPlatform.platform;
-import static com.academy.allps.domain.QProblem.problem;
-import static com.academy.allps.domain.QProblemCategory.problemCategory;
+import static com.academy.allps.entity.QCategory.category;
+import static com.academy.allps.entity.QDifficulty.difficulty;
+import static com.academy.allps.entity.QPlatform.platform;
+import static com.academy.allps.entity.QProblem.problem;
+import static com.academy.allps.entity.QProblemCategory.problemCategory;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+import com.academy.allps.type.QueryType;
 import com.academy.allps.dto.ProblemDto;
-import com.academy.allps.dto.ProblemSearchCondition;
-import com.querydsl.core.types.OrderSpecifier;
-
+import com.academy.allps.dto.RequestDto;
+import com.academy.allps.type.CategoryType;
+import com.academy.allps.type.DifficultyType;
+import com.academy.allps.type.OrderBy;
+import com.academy.allps.type.PlatformType;
+import com.academy.allps.type.SortCondition;
+import org.springframework.stereotype.Repository;
+import org.springframework.util.ObjectUtils;
+import com.querydsl.core.Tuple;
 import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Repository;
 
 @RequiredArgsConstructor
 @Repository
 public class ProblemRepositoryCustomImpl implements ProblemRepositoryCustom {
+    public static final long PAGE_SIZE = 20;
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public List<ProblemDto> searchProblems(ProblemSearchCondition searchCondition) {
+    public List<ProblemDto> findMatchedProblems(String query, QueryType type, RequestDto requestDto) {
 
-        List<ProblemDto> problems = getProblems(searchCondition);
-        return problems;
-    }
-
-    @Override
-    public Long searchProblemCount(ProblemSearchCondition searchCondition) {
-
-        Long count = getCount(searchCondition);
-        return count;
-    }
-
-    private List<ProblemDto> getProblems(ProblemSearchCondition searchCondition) {
         List<ProblemDto> problems = queryFactory.select(Projections.constructor(ProblemDto.class,
                         problem.id,
                         problem.code,
                         problem.name,
                         problem.url,
-                        difficulty.name,
-                        platform.name
+                        problem.solvedCount,
+                        platform.name,
+                        difficulty.name
                 ))
                 .from(problem)
-                .leftJoin(problem.problemCategories, problemCategory)
-                .leftJoin(problemCategory.category, category)
-                .innerJoin(problem.difficulty, difficulty)
-                .innerJoin(problem.platform, platform)
+                .leftJoin(problem.platform, platform)
+                .leftJoin(problem.difficulty, difficulty)
+                .leftJoin(problemCategory).on(problemCategory.problem.eq(problem))
+                .leftJoin(category).on(problemCategory.category.eq(category))
                 .where(
-                        searchQuery(searchCondition),
-                        searchPlatforms(searchCondition),
-                        searchCategories(searchCondition),
-                        searchDifficulty(searchCondition)
-                )
-                .orderBy(sort(searchCondition))
+                        resolveQuery(query, type),
+                        resolvePlatforms(requestDto.getPlatforms()),
+                        resolveCategories(requestDto.getCategories()),
+                        resolveDifficulties(requestDto.getDifficulties()))
                 .groupBy(problem.id)
-                .offset((searchCondition.getPage() - 1) * 20)
-                .limit(20)
+                .orderBy(resolveOrderBy(requestDto.getSortCondition(), requestDto.getOrderBy()))
+                .offset(resolvePage(requestDto.getPage()))
+                .limit(PAGE_SIZE)
                 .fetch();
 
-        problems.forEach(problemDto -> {
-            List<String> categories = queryFactory
-                    .select(category.name)
-                    .from(problemCategory)
-                    .innerJoin(problemCategory.category, category)
-                    .where(problemCategory.problem.id.eq(problemDto.getId()))
-                    .fetch();
+        List<Tuple> problemCategories = queryFactory
+                .select(problemCategory.problem.id, category.name)
+                .from(problemCategory)
+                .join(problemCategory.category, category)
+                .where(problemCategory.problem.id.in(
+                        problems.stream()
+                                .map(problemDto -> problemDto.getId())
+                                .collect(Collectors.toList())))
+                .fetch();
 
-            problemDto.setCategories(categories);
+        Map<Long, List<CategoryType>> categoryMap = new HashMap<>();
+        problemCategories.forEach(tuple -> {
+            Long problemId = tuple.get(problemCategory.problem.id);
+            CategoryType categoryType = tuple.get(category.name);
+            categoryMap.computeIfAbsent(problemId, k -> new ArrayList<>()).add(categoryType);
         });
+
+        problems.forEach(problemDto -> {
+            List<CategoryType> categoryList = categoryMap.getOrDefault(problemDto.getId(), Collections.emptyList());
+            problemDto.setCategories(categoryList);
+        });
+
         return problems;
     }
 
-    private Long getCount(ProblemSearchCondition searchCondition) {
-        Long count = queryFactory
-                .select(problem.countDistinct())
+    @Override
+    public Long findMatchedProblemCounts(String query, QueryType type, RequestDto requestDto) {
+        return queryFactory.select(problem.countDistinct())
                 .from(problem)
-                .leftJoin(problem.problemCategories, problemCategory)
-                .leftJoin(problemCategory.category, category)
-                .innerJoin(problem.difficulty, difficulty)
-                .innerJoin(problem.platform, platform)
+                .leftJoin(problem.platform, platform)
+                .leftJoin(problem.difficulty, difficulty)
+                .leftJoin(problemCategory).on(problemCategory.problem.eq(problem))
+                .leftJoin(category).on(problemCategory.category.eq(category))
                 .where(
-                        searchQuery(searchCondition),
-                        searchPlatforms(searchCondition),
-                        searchCategories(searchCondition),
-                        searchDifficulty(searchCondition)
-                )
+                        resolveQuery(query, type),
+                        resolvePlatforms(requestDto.getPlatforms()),
+                        resolveCategories(requestDto.getCategories()),
+                        resolveDifficulties(requestDto.getDifficulties()))
                 .fetchOne();
-        return count;
     }
 
-    private BooleanExpression searchQuery(ProblemSearchCondition searchCondition) {
-        if (searchCondition.getSearchQuery() == null || searchCondition.getSearchQuery().isEmpty()) {
+    private BooleanExpression resolveQuery(String query, QueryType type) {
+        if (ObjectUtils.isEmpty(query)) {
             return null;
+        } else if (ObjectUtils.isEmpty(type)) {
+            type = QueryType.name;
         }
 
-        if (searchCondition.getSearchType().equals("code")) {
-            return problem.code.like("%" + searchCondition.getSearchQuery() + "%");
+        if (type.equals(QueryType.code)) {
+            return problem.code.like("%" + query + "%");
         }
-
-        return problem.name.like("%" + searchCondition.getSearchQuery() + "%");
+        return problem.name.like("%" + query + "%");
     }
 
-    private BooleanExpression searchPlatforms(ProblemSearchCondition searchCondition) {
-        if (searchCondition.getPlatforms() == null || searchCondition.getPlatforms().isEmpty()) {
-            return null;
+    private BooleanExpression resolvePlatforms(List<PlatformType> platforms) {
+        if (!ObjectUtils.isEmpty(platforms)) {
+            return platform.name.in(platforms);
         }
-        return platform.name.in(searchCondition.getPlatforms());
+        return null;
     }
 
-    private BooleanExpression searchCategories(ProblemSearchCondition searchCondition) {
-        if (searchCondition.getCategories() == null || searchCondition.getCategories().isEmpty()) {
-            return null;
+    private BooleanExpression resolveCategories(List<CategoryType> categories) {
+        if (!ObjectUtils.isEmpty(categories)) {
+            return problemCategory.category.name.in(categories);
         }
-        return problemCategory.category.name.in(searchCondition.getCategories());
+        return null;
     }
 
-    private BooleanExpression searchDifficulty(ProblemSearchCondition searchCondition) {
-        if (searchCondition.getDifficulties() == null || searchCondition.getDifficulties().isEmpty()) {
-            return null;
+    private BooleanExpression resolveDifficulties(List<DifficultyType> difficulties) {
+        if (!ObjectUtils.isEmpty(difficulties)) {
+            return difficulty.name.in(difficulties);
         }
-        return difficulty.name.in(searchCondition.getDifficulties());
+        return null;
     }
 
-    private OrderSpecifier<?> sort(ProblemSearchCondition searchCondition) {
-        if (searchCondition.getSortCondition() == null || searchCondition.getSortCondition().isEmpty()) {
+    private OrderSpecifier<?> resolveOrderBy(SortCondition sortCondition, OrderBy orderBy) {
+        if (ObjectUtils.isEmpty(sortCondition) || ObjectUtils.isEmpty(orderBy)) {
             return problem.id.asc();
-        }
-
-        String sortCondition = searchCondition.getSortCondition();
-        String orderBy = searchCondition.getOrderBy();
-
-        if (sortCondition.equals("difficulty") && orderBy.equals("ASC")) {
+        } else if (sortCondition.equals(SortCondition.difficulty) && orderBy.equals(OrderBy.DESC)) {
             return problem.difficulty.id.asc();
-        } else if (sortCondition.equals("difficulty") && orderBy.equals("DESC")) {
+        } else if (sortCondition.equals(SortCondition.difficulty) && orderBy.equals(OrderBy.ASC)) {
             return problem.difficulty.id.desc();
-        } else {
-            return problem.id.asc();
         }
+        return problem.id.asc();
+    }
+
+    private long resolvePage(Long page) {
+        return (page - 1) * PAGE_SIZE;
     }
 }

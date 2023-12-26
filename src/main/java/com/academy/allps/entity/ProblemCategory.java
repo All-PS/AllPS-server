@@ -1,4 +1,4 @@
-package com.academy.allps.domain;
+package com.academy.allps.entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;

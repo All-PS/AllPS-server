@@ -1,28 +1,33 @@
 package com.academy.allps.service;
 
+import static com.academy.allps.repository.ProblemRepositoryCustomImpl.PAGE_SIZE;
+
+import java.util.List;
 import com.academy.allps.dto.ProblemDto;
-import com.academy.allps.dto.ProblemSearchCondition;
+import com.academy.allps.type.QueryType;
+import com.academy.allps.dto.RequestDto;
 import com.academy.allps.dto.ResponseDto;
 import com.academy.allps.repository.ProblemRepository;
-import java.util.List;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import lombok.RequiredArgsConstructor;
 
-@Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
+@Service
 public class ProblemService {
     private final ProblemRepository problemRepository;
 
-    public ResponseDto getMatchedProblems(ProblemSearchCondition problemSearchCondition) {
+    public ResponseDto getMatchedProblems(String query, QueryType type, RequestDto requestDto) {
 
-        List<ProblemDto> problems = problemRepository.searchProblems(problemSearchCondition);
+        long totalPages = calculateTotalPages(query, type, requestDto);
+        List<ProblemDto> problems = problemRepository.findMatchedProblems(query, type, requestDto);
 
-        int page = problemSearchCondition.getPage();
-        int totalProblems = problemRepository.searchProblemCount(problemSearchCondition).intValue();
-        int totalPages = (int) Math.ceil((double) totalProblems / 20);
+        return new ResponseDto(requestDto.getPage(), totalPages, problems);
+    }
 
-        return new ResponseDto(page, totalPages, problems);
+    private int calculateTotalPages(String query, QueryType type, RequestDto requestDto) {
+        Long matchedProblemCounts = problemRepository.findMatchedProblemCounts(query, type, requestDto);
+        return (int) Math.ceil((double) matchedProblemCounts / PAGE_SIZE);
     }
 }

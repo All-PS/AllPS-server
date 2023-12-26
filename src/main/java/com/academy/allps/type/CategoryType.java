@@ -1,0 +1,31 @@
+package com.academy.allps.type;
+
+public enum CategoryType {
+    dp,
+    implementation,
+    greedy,
+    bruteforcing,
+    string,
+    backtracking,
+    graph,
+    two_pointer,
+    tree,
+    priority_queue,
+    data_structure,
+    shortest_path,
+    prefix_sum,
+    binary_search,
+    precomputation,
+    math,
+    recursion,
+    divide_and_conquer,
+    sorting,
+    topological_sorting,
+    hashing,
+    geometry,
+    disjoint_set,
+    mst,
+    segment_tree,
+    bitmasking,
+    flow
+}
