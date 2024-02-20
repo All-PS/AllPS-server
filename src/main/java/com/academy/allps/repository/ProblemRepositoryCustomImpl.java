@@ -104,6 +104,26 @@ public class ProblemRepositoryCustomImpl implements ProblemRepositoryCustom {
                 .fetchOne();
     }
 
+    @Override
+    public List<ProblemDto> findMatchedProblemsById(List<Long> problemIds) {
+        return queryFactory.select(Projections.constructor(ProblemDto.class,
+                problem.id,
+                problem.code,
+                problem.name,
+                problem.url,
+                problem.solvedCount,
+                platform.name,
+                difficulty.name
+                ))
+                .from(problem)
+                .leftJoin(problem.platform, platform)
+                .leftJoin(problem.difficulty, difficulty)
+                .leftJoin(problemCategory).on(problemCategory.problem.eq(problem))
+                .leftJoin(category).on(problemCategory.category.eq(category))
+                .where(resolveIds(problemIds))
+                .fetch();
+    }
+
     private BooleanExpression resolveQuery(String query, QueryType type) {
         if (ObjectUtils.isEmpty(query)) {
             return null;
@@ -115,6 +135,13 @@ public class ProblemRepositoryCustomImpl implements ProblemRepositoryCustom {
             return problem.code.like("%" + query + "%");
         }
         return problem.name.like("%" + query + "%");
+    }
+
+    private BooleanExpression resolveIds(List<Long> problemIds) {
+        if (!ObjectUtils.isEmpty(problemIds)) {
+            return problem.id.in(problemIds);
+        }
+        return null;
     }
 
     private BooleanExpression resolvePlatforms(List<PlatformType> platforms) {

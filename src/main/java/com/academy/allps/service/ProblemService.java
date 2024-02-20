@@ -30,4 +30,9 @@ public class ProblemService {
         Long matchedProblemCounts = problemRepository.findMatchedProblemCounts(query, type, requestDto);
         return (int) Math.ceil((double) matchedProblemCounts / PAGE_SIZE);
     }
+
+    public List<ProblemDto> getMatchedProblems(List<Long> problemIds) {
+
+        return problemRepository.findMatchedProblemsById(problemIds);
+    }
 }

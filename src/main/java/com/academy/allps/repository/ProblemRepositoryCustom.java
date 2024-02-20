@@ -9,4 +9,5 @@ public interface ProblemRepositoryCustom {
 
     List<ProblemDto> findMatchedProblems(String query, QueryType type, RequestDto requestDto);
     Long findMatchedProblemCounts(String query, QueryType type, RequestDto requestDto);
+    List<ProblemDto> findMatchedProblemsById(List<Long> problemIds);
 }
