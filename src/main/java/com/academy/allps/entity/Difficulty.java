@@ -1,20 +1,19 @@
-package com.academy.allps.domain;
+package com.academy.allps.entity;
 
+import com.academy.allps.type.DifficultyType;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import lombok.Getter;
 
 @Entity
-@Getter
 public class Difficulty {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String name;
-
-//    @OneToMany(mappedBy = "difficulty")
-//    List<Problem> problems;
+    @Enumerated(EnumType.STRING)
+    private DifficultyType name;
 }
