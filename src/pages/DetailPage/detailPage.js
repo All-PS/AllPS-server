@@ -236,24 +236,32 @@
 // export default DetailPage;
 
 // DetailPage.js
-import React, { useEffect, useCallback, useRef } from "react";
+import React, { useEffect, useCallback, useRef, useState } from "react";
 import { useRecoilState } from "recoil";
 import {
   selectedPlatformsState,
   selectedDifficultiesState,
   selectedCategoriesState,
+  selectedRatingsState, // 추가: 별점 상태 관리
   totalPagesState,
   currentPageState,
   problemsState,
   showDifficultyState,
   showCategoriesState,
+  sortDifficultyState, // 추가: 난이도 정렬 상태를 사용하기 위해 import
 } from "pages/DetailPage/state";
+
 import Header from "components/Header/header";
 import FilterSection from "pages/DetailPage/filterSection";
 import ProblemsSection from "pages/DetailPage/problemsSection";
 import PageSection from "pages/DetailPage/pageSection";
 import { useLocation } from "react-router-dom";
-import { platforms, difficulties, categories } from "pages/DetailPage/state";
+import {
+  platforms,
+  difficulties,
+  categories,
+  ratings,
+} from "pages/DetailPage/state";
 
 function DetailPage({ searchTypes }) {
   const [selectedPlatforms, setSelectedPlatforms] = useRecoilState(
@@ -265,6 +273,10 @@ function DetailPage({ searchTypes }) {
   const [selectedCategories, setSelectedCategories] = useRecoilState(
     selectedCategoriesState
   );
+  // const [selectedRatings, setSelectedRatings] =
+  //   useRecoilState(selectedRatingsState); // 별점 상태 추가
+  // const [sortDifficulty, setSortDifficulty] =
+  //   useRecoilState(sortDifficultyState); // 추가: 난이도 정렬 상태 관리
   const [totalPages, setTotalPages] = useRecoilState(totalPagesState);
   const [currentPage, setCurrentPage] = useRecoilState(currentPageState);
   const [problems, setProblems] = useRecoilState(problemsState);
@@ -297,6 +309,10 @@ function DetailPage({ searchTypes }) {
         {}
       )
     );
+    // 별점 선택 초기화
+    // setSelectedRatings(
+    //   ratings.reduce((acc, rating) => ({ ...acc, [rating.ko]: false }), {})
+    // );
   };
 
   // 필터 변경 핸들러

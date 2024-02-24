@@ -1,50 +1,10 @@
-// state.js
+// state.js // 추천문제페이지에 있는 필터에 쓰임
 import { atom } from "recoil";
-
-// export const platforms = [
-//   "백준",
-//   "프로그래머스",
-//   "코드포스",
-//   "코드트리",
-//   "알고스팟",
-// ];
-
 export const platforms = [
   { en: "baekjoon", ko: "백준" },
   { en: "programmers", ko: "프로그래머스" },
   { en: "codeforces", ko: "코드포스" },
-  //{ en: "codetree", ko: "코드트리" },
-  //{ en: "algospot", ko: "알고스팟" },
 ];
-
-// export const difficulties = [
-//   "브론즈5",
-//   "실버5",
-//   "골드5",
-//   "플래티넘5",
-//   "다이아5",
-//   "브론즈4",
-//   "실버4",
-//   "골드4",
-//   "플래티넘4",
-//   "다이아4",
-//   "브론즈3",
-//   "실버3",
-//   "골드3",
-//   "플래티넘3",
-//   "다이아3",
-//   "브론즈2",
-//   "실버2",
-//   "골드2",
-//   "플래티넘2",
-//   "다이아2",
-//   "브론즈1",
-//   "실버1",
-//   "골드1",
-//   "플래티넘1",
-//   "다이아1",
-// ];
-
 export const difficulties = [
   { en: "bronze5", ko: "브론즈5" },
   { en: "silver5", ko: "실버5" },
@@ -72,36 +32,6 @@ export const difficulties = [
   { en: "platinum1", ko: "플래티넘1" },
   { en: "diamond1", ko: "다이아1" },
 ];
-// export const categories = [
-//   "DP",
-//   "구현",
-//   "그리디",
-//   "완전탐색",
-//   "문자열",
-//   "백트래킹",
-//   "그래프탐색",
-//   "투포인터",
-//   "트리",
-//   "우선순위큐",
-//   "자료구조",
-//   "최단거리",
-//   "누적합",
-//   "이진탐색",
-//   "전처리",
-//   "수학",
-//   "재귀",
-//   "분할정복",
-//   "정렬",
-//   "위상정렬",
-//   "해싱",
-//   "기하학",
-//   "분리집합",
-//   "최소신장트리",
-//   "세그먼트트리",
-//   "비트마스킹",
-//   "유량",
-// ];
-export const likes = [{}];
 export const categories = [
   { en: "dp", ko: "DP" },
   { en: "implementation", ko: "구현" },
@@ -131,16 +61,6 @@ export const categories = [
   { en: "bitmasking", ko: "비트마스킹" },
   { en: "flow", ko: "유량" },
 ];
-// export const rating = [{}];
-
-// 별점 필터링을 위한 최소값과 최대값 상태 정의 //recoil사용
-// export const ratingFilterState = atom({
-//   key: "ratingFilterState",
-//   default: {
-//     minRating: 0.0, // 최소 별점
-//     maxRating: 5.0, // 최대 별점
-//   },
-// });
 
 export const selectedPlatformsState = atom({
   key: "selectedPlatformsState",
@@ -199,7 +119,8 @@ export const showCategoriesState = atom({
   default: false,
 });
 
-// export const sortDifficultyState = atom({
-//   key: "sortDifficultyState",
-//   default: false, // 기본적으로 난이도 정렬은 비활성화
-// });
+// 추천문제 안에서 난이도 정렬에 필요한 부분
+export const sortDifficultyState = atom({
+  key: "sortDifficultyState",
+  default: false, // 기본적으로 난이도 정렬은 비활성화
+});

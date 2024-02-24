@@ -42,6 +42,20 @@ function FilterSection({
   const [showCategories, setShowCategories] =
     useRecoilState(showCategoriesState);
 
+  // 최소 별점 state
+  const [priceMin, setPriceMin] = useState("");
+  // 최대 별점 state 추가
+  const [priceMax, setPriceMax] = useState("");
+
+  // 최소 별점 변경을 처리하는 함수
+  const handlePriceMinChange = (event) => {
+    setPriceMin(event.target.value);
+  };
+
+  // 최대 별점 변경을 처리하는 함수 추가
+  const handlePriceMaxChange = (event) => {
+    setPriceMax(event.target.value);
+  };
   const isAllPlatformsSelected =
     Object.values(selectedPlatforms).every(Boolean);
 
@@ -141,6 +155,12 @@ function FilterSection({
   //   );
   // }, [selectedDifficulties, difficulties]);
 
+  // 난이도 정렬 처리 함수
+  // const handleDifficultySort = () => {
+  //   setIsDifficultySorted(!isDifficultySorted);
+  //   // 추가적으로 필요한 데이터 페치 로직을 여기에 구현하거나, useEffect 내에서 isDifficultySorted 의존성을 감지하여 처리
+  // };
+
   return (
     <div
       className={`flex flex-col items-center mx-auto rounded-lg ${className}`}
@@ -156,23 +176,46 @@ function FilterSection({
         >
           검색필터
         </button>
-
         <Toggle
-          name="난이도"
+          name="난이도 보기"
           state={showDifficulty}
           setState={setShowDifficulty}
         ></Toggle>
-
         <Toggle
           name="유형"
           state={showCategories}
           setState={setShowCategories}
         ></Toggle>
-
+        {/* <Toggle
+          name="난이도 정렬"
+          state={showCategories}
+          setState={setShowCategories}
+        ></Toggle> */}
         {/* <Toggle
           name="난이도 보기"
           state={showAdvancedDifficulties}
           setState={setShowAdvancedDifficulties}
+        /> */}{" "}
+        {/* <input
+          value={priceMin}
+          onChange={handlePriceMinChange}
+          className="ml-4 division_search_input"
+          name="priceMin"
+          type="text"
+          maxLength="4"
+          title="최소 별점 검색"
+          placeholder="최소 별점"
+        /> */}
+        {/* 최대 가격 입력 창 추가 */}
+        {/* <input
+          value={priceMax}
+          onChange={handlePriceMaxChange}
+          className="ml-4 division_search_input"
+          name="priceMax"
+          type="text"
+          maxLength="4"
+          title="최대 별점 검색"
+          placeholder="최대 별점"
         /> */}
       </div>
       <div
@@ -209,6 +252,13 @@ function FilterSection({
             onSelect={onCategorySelect}
             onTitleClick={toggleAllCategories}
           />
+          {/* <FilterDetailSection
+            title="별점"
+            options={categories}
+            selectedOptions={selectedCategories}
+            onSelect={onCategorySelect}
+            onTitleClick={toggleAllCategories}
+          /> */}
         </div>
       </div>
     </div>
